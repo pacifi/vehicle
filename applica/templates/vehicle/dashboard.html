@@ -1,0 +1,14 @@
+{% extends "layout/base.html" %}
+{% block sidebar %}
+    {{ block.super }}
+    <h3>Vistas Personalizadas</h3>
+    <ul class="custom-menu">
+        {% for link in custom_links %}
+            <li><a href="{% url link.url %}">{{ link.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    Bienvenido a la vista de reportes
+{% endblock %}
