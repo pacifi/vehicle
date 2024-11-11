@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from applica.sites import custom_admin_site
-from applica.views import dashboard, reporte_velocidad
+from applica.views import DashboardTemplateView
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -26,7 +26,7 @@ urlpatterns = [
 
     # path("select2/", include("django_select2.urls")),
 
-    path('', dashboard, name='dashboard'),
+    path('', DashboardTemplateView.as_view(), name='dashboard'),
 
     path('app/', include('applica.urls', namespace='app')),
 ]

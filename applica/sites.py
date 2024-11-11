@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from unfold.sites import UnfoldAdminSite
 
-from applica.views import dashboard
+from applica.views import DashboardTemplateView
 
 
 class CustomAdminSite(UnfoldAdminSite):
@@ -13,7 +13,7 @@ class CustomAdminSite(UnfoldAdminSite):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            path('mi-vista/', self.admin_view(dashboard), name='dashboard'),
+            path('mi-vista/', self.admin_view(DashboardTemplateView.as_view()), name='dashboard'),
         ]
         return custom_urls + urls
 
