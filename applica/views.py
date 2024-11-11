@@ -33,6 +33,12 @@ class RevisionTecnicaTemplateView(TemplateView):
             # Calcular el tiempo transcurrido desde la fecha de revisión
             tiempo_transcurrido = fecha_actual - revision.fecha_revision
             meses_transcurridos = tiempo_transcurrido.days / 30  # Aproximadamente 30 días por mes
+            dias_restantes = 365 - tiempo_transcurrido.days
+            vencido = False  # Variable para indicar si está vencido
+
+            if dias_restantes < 0:
+                dias_restantes = abs(dias_restantes)  # Convertir a positivo para mostrar días vencidos
+                vencido = True
 
             # Determinar el color de la alerta según la antigüedad
             if meses_transcurridos > 11:
@@ -46,8 +52,18 @@ class RevisionTecnicaTemplateView(TemplateView):
                 'revision': revision,
                 'alerta_clase': alerta_clase,
                 'meses_transcurridos': meses_transcurridos,
+                'dias_restantes': dias_restantes,
+                'vencido': vencido,  # Indica si está vencido
             })
 
         # Añadir la lista de alertas al contexto
         context['alertas'] = alertas
+        return context
+
+
+class ReporteIncidenciasTemplateView(TemplateView):
+    template_name = "vehicle/reporte_incidencias.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ReporteIncidenciasTemplateView, self).get_context_data(**kwargs)
         return context

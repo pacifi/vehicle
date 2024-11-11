@@ -2,10 +2,8 @@
 
 {% block content %}
     <h2>Alertas de Revisiones Técnicas</h2>
-
     {% if alertas %}
         <div class="list-group">
-           
             {% for alerta in alertas %}
                 <div class="list-group-item">
                     <div class="{{ alerta.alerta_clase }}">
@@ -13,9 +11,21 @@
                             - {{ alerta.revision.fecha_revision }} {{ alerta.alerta_clase }}</h5>
                         <p class="mb-1">Tiempo transcurrido: {{ alerta.meses_transcurridos|floatformat:1 }} meses</p>
                         <p class="mb-1">Resultado: {{ alerta.revision.resultado }}</p>
+
                         {% if alerta.revision.observaciones %}
                             <small>Observaciones: {{ alerta.revision.observaciones }}</small>
                         {% endif %}
+
+                        <!-- Mostrar días restantes para cumplir un año o días vencidos -->
+                        {% if alerta.vencido %}
+                            <p class="text-danger mb-1">Revisión técnica vencida hace {{ alerta.dias_restantes }}
+                                días</p>
+                        {% else %}
+                            <p class="mb-1">Días restantes para vencer: <strong>{{ alerta.dias_restantes }}</strong></p>
+                        {% endif %}
+
+                        <a class="btn btn-warning"
+                           href="/admin/applica/revisiontecnica/{{ alerta.revision.id }}/change">Editar revisión</a>
                     </div>
                 </div>
             {% endfor %}
