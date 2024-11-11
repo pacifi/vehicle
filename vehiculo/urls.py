@@ -27,6 +27,6 @@ urlpatterns = [
     # path("select2/", include("django_select2.urls")),
 
     path('', dashboard, name='dashboard'),
-    path('reporte/velocidad', reporte_velocidad, name='reporte_velocidad'),
 
+    path('app/', include('applica.urls', namespace='app')),
 ]
