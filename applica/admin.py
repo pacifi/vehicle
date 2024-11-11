@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from applica.models import Conductor, Vehiculo, Marca, Modelo, ConductorVehiculo, RevisionTecnica, Infraccion, \
-    Incidencia, ExcesoVelocidad
+    Incidencia, ExcesoVelocidad, Soat
 
 from unfold.admin import ModelAdmin
 
@@ -61,5 +61,12 @@ class IncidenciaAdmin(ModelAdmin):
 @admin.register(ExcesoVelocidad, site=custom_admin_site)
 class ExcesoVelocidadAdmin(ModelAdmin):
     list_display = ("id", "vehiculo", "fecha_evento", "velocidad", "ubicacion")
+    search_fields = ("id", "vehiculo__placa")
+    autocomplete_fields = ('vehiculo',)
+
+
+@admin.register(Soat, site=custom_admin_site)
+class SoatAdmin(ModelAdmin):
+    list_display = ("id", "vehiculo", "fecha_renovacion",)
     search_fields = ("id", "vehiculo__placa")
     autocomplete_fields = ('vehiculo',)

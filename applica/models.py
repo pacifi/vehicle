@@ -99,3 +99,13 @@ class ExcesoVelocidad(models.Model):
 
     def __str__(self):
         return f"Exceso de velocidad {self.velocidad} km/h - {self.vehiculo} en {self.fecha_evento}"
+
+class Soat(models.Model):
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    fecha_renovacion = models.DateField()
+
+    class Meta:
+        unique_together = (('vehiculo'),)
+
+    def __str__(self):
+        return f"Soat {self.fecha_renovacion} - {self.vehiculo}"

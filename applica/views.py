@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.generic import TemplateView
 
-from applica.models import RevisionTecnica
+from applica.models import RevisionTecnica, Soat
 
 
 class DashboardTemplateView(TemplateView):
@@ -66,4 +66,47 @@ class ReporteIncidenciasTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ReporteIncidenciasTemplateView, self).get_context_data(**kwargs)
+        return context
+
+class SoatTemplateView(TemplateView):
+    template_name = "vehicle/reporte_soat.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(SoatTemplateView, self).get_context_data(**kwargs)
+
+        revisiones = Soat.objects.all().order_by('fecha_renovacion')
+
+        fecha_actual = timezone.now().date()
+
+        alertas = []
+
+        for revision in revisiones:
+            # Calcular el tiempo transcurrido desde la fecha de revisión
+            tiempo_transcurrido = fecha_actual - revision.fecha_renovacion
+            meses_transcurridos = tiempo_transcurrido.days / 30  # Aproximadamente 30 días por mes
+            dias_restantes = 365 - tiempo_transcurrido.days
+            vencido = False  # Variable para indicar si está vencido
+
+            if dias_restantes < 0:
+                dias_restantes = abs(dias_restantes)  # Convertir a positivo para mostrar días vencidos
+                vencido = True
+
+            # Determinar el color de la alerta según la antigüedad
+            if meses_transcurridos > 11:
+                alerta_clase = 'alert alert-danger'  # Rojo: Más de 11 meses
+            elif 10 <= meses_transcurridos <= 11:
+                alerta_clase = 'alert alert-warning'  # Amarillo: Entre 10 y 11 meses
+            else:
+                alerta_clase = 'alert alert-success'  # Verde: Menos de 10 meses
+
+            alertas.append({
+                'revision': revision,
+                'alerta_clase': alerta_clase,
+                'meses_transcurridos': meses_transcurridos,
+                'dias_restantes': dias_restantes,
+                'vencido': vencido,  # Indica si está vencido
+            })
+
+        # Añadir la lista de alertas al contexto
+        context['alertas'] = alertas
         return context
