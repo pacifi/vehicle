@@ -14,7 +14,6 @@ class DashboardTemplateView(TemplateView):
 class ReporteVelcidadTemplateView(TemplateView):
     template_name = "vehicle/reporte_velocidad.html"
 
-
 class RevisionTecnicaTemplateView(TemplateView):
     template_name = "vehicle/alerta_revision.html"
 
@@ -40,13 +39,13 @@ class RevisionTecnicaTemplateView(TemplateView):
                 dias_restantes = abs(dias_restantes)  # Convertir a positivo para mostrar días vencidos
                 vencido = True
 
-            # Determinar el color de la alerta según la antigüedad
-            if meses_transcurridos > 11:
-                alerta_clase = 'alert alert-danger'  # Rojo: Más de 11 meses
-            elif 10 <= meses_transcurridos <= 11:
-                alerta_clase = 'alert alert-warning'  # Amarillo: Entre 10 y 11 meses
+            # Determinar el color de la alerta según los meses transcurridos
+            if meses_transcurridos >= 12:
+                alerta_clase = 'alert alert-danger'  # Rojo: Más de 12 meses (un año o más)
+            elif 11 <= meses_transcurridos < 12:
+                alerta_clase = 'alert alert-warning'  # Amarillo: Entre 11 y 12 meses (falta un mes o menos)
             else:
-                alerta_clase = 'alert alert-success'  # Verde: Menos de 10 meses
+                alerta_clase = 'alert alert-success'  # Verde: Menos de 11 meses
 
             alertas.append({
                 'revision': revision,
@@ -59,7 +58,6 @@ class RevisionTecnicaTemplateView(TemplateView):
         # Añadir la lista de alertas al contexto
         context['alertas'] = alertas
         return context
-
 
 class ReporteIncidenciasTemplateView(TemplateView):
     template_name = "vehicle/reporte_incidencias.html"
@@ -74,14 +72,16 @@ class SoatTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(SoatTemplateView, self).get_context_data(**kwargs)
 
+        # Obtener todas las revisiones del SOAT, ordenadas por fecha de renovación
         revisiones = Soat.objects.all().order_by('fecha_renovacion')
 
+        # Obtener la fecha actual
         fecha_actual = timezone.now().date()
 
         alertas = []
 
         for revision in revisiones:
-            # Calcular el tiempo transcurrido desde la fecha de revisión
+            # Calcular el tiempo transcurrido desde la fecha de renovación
             tiempo_transcurrido = fecha_actual - revision.fecha_renovacion
             meses_transcurridos = tiempo_transcurrido.days / 30  # Aproximadamente 30 días por mes
             dias_restantes = 365 - tiempo_transcurrido.days
@@ -91,13 +91,13 @@ class SoatTemplateView(TemplateView):
                 dias_restantes = abs(dias_restantes)  # Convertir a positivo para mostrar días vencidos
                 vencido = True
 
-            # Determinar el color de la alerta según la antigüedad
-            if meses_transcurridos > 11:
-                alerta_clase = 'alert alert-danger'  # Rojo: Más de 11 meses
-            elif 10 <= meses_transcurridos <= 11:
-                alerta_clase = 'alert alert-warning'  # Amarillo: Entre 10 y 11 meses
+            # Determinar el color de la alerta según los meses transcurridos
+            if meses_transcurridos >= 12:
+                alerta_clase = 'alert alert-danger'  # Rojo: Más de 12 meses (un año o más)
+            elif 11 <= meses_transcurridos < 12:
+                alerta_clase = 'alert alert-warning'  # Amarillo: Entre 11 y 12 meses (falta un mes o menos)
             else:
-                alerta_clase = 'alert alert-success'  # Verde: Menos de 10 meses
+                alerta_clase = 'alert alert-success'  # Verde: Menos de 11 meses
 
             alertas.append({
                 'revision': revision,
