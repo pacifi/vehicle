@@ -1,15 +1,26 @@
 {% extends 'layout/base.html' %}
 {% load static %}
 {% block content %}
+
     <div id="AppVue">
         {% verbatim %}
         <div class="row g-3 align-items-center">
             <div class="col-auto">
-                <label for="inputPassword6" class="col-form-label">Seleccione año</label>
+                <label for="inputYear" class="col-form-label">Seleccione año</label>
             </div>
             <div class="col-auto">
                 <select class="form-control form-inline" id="yearSelect" v-model="year" @change="updateChart">
                     <option v-for="yearOption in yearOptions" :key="yearOption" :value="yearOption">{{ yearOption }}
+                    </option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="inputMonth" class="col-form-label">Seleccione mes</label>
+            </div>
+            <div class="col-auto">
+                <select class="form-control form-inline" id="monthSelect" v-model="month" @change="updateChart">
+                    <option v-for="monthOption in monthOptions" :key="monthOption" :value="monthOption">{{ monthOption
+                        }}
                     </option>
                 </select>
             </div>
@@ -34,10 +45,13 @@
         createApp({
             data() {
                 return {
-                    data: [],
-                    chart: null, // Mantendrá la referencia al gráfico
+                    dataReport: [],
+                    dataLabel: [],
+                    chart: null,
                     year: 2024,
-                    yearOptions: [2022, 2023, 2024, 2025] // Opciones de años disponibles
+                    yearOptions: [2022, 2023, 2024, 2025],
+                    month: "01",
+                    monthOptions: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
                 }
             },
 
@@ -49,8 +63,9 @@
                 async loadData() {
                     try {
                         // Solicita los datos del año seleccionado
-                        const response = await axios.get(`/app/api/insidencias/${this.year}`);
-                        this.data = response.data || []; // Asegurarse de que `data` siempre sea un arreglo
+                        const response = await axios.get(`/app/api/insidencias-conductor/${this.year}/${this.month}`);
+                        this.dataLabel = response.data.conductores || []; // Asegurarse de que `data` siempre sea un arreglo
+                        this.dataReport = response.data.incidencias || []; // Asegurarse de que `data` siempre sea un arreglo
 
                         // Si el gráfico ya existe, destrúyelo primero antes de crear uno nuevo
                         if (this.chart) {
@@ -71,10 +86,10 @@
                     this.chart = new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"],
+                            labels: this.dataLabel,
                             datasets: [{
-                                label: 'Incidencias',
-                                data: this.data,
+                                label: 'Excesos de Velocidad',
+                                data: this.dataReport,
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 borderWidth: 1
@@ -90,12 +105,11 @@
                     });
                 },
                 updateChart() {
-                    console.log("update chart");
-
-                    // Solo llama a loadData si el año ha cambiado
-                    if (this.year !== this.previousYear) {
-                        this.previousYear = this.year;
-                        this.loadData();
+                    // Verifica si cambió el año o el mes
+                    if (this.year !== this.previousYear || this.month !== this.previousMonth) {
+                        this.previousYear = this.year;   // Actualiza el año anterior
+                        this.previousMonth = this.month; // Actualiza el mes anterior
+                        this.loadData(); // Carga los datos actualizados
                     }
                 }
             }

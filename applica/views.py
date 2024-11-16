@@ -11,14 +11,6 @@ class DashboardTemplateView(TemplateView):
     template_name = 'vehicle/dashboard.html'
 
 
-class ReporteIncidenciasTemplateView(TemplateView):
-    template_name = 'vehicle/reporte_incidencias.html'
-
-
-class ReporteVelcidadTemplateView(TemplateView):
-    template_name = "vehicle/reporte_velocidad.html"
-
-
 class AlertaRevisionTecnicaTemplateView(TemplateView):
     template_name = "vehicle/alerta_revision.html"
 
@@ -63,12 +55,20 @@ class AlertaRevisionTecnicaTemplateView(TemplateView):
         return context
 
 
+class ReporteVelcidadTemplateView(TemplateView):
+    template_name = "vehicle/reporte_velocidad.html"
+
+
+class ReporteVelcidadVehiculoTemplateView(TemplateView):
+    template_name = "vehicle/reporte_velocidad_vehiculo.html"
+
+
 class ReporteIncidenciasTemplateView(TemplateView):
     template_name = "vehicle/reporte_incidencias.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(ReporteIncidenciasTemplateView, self).get_context_data(**kwargs)
-        return context
+
+class ReporteIncidenciasChoferTemplateView(TemplateView):
+    template_name = "vehicle/reporte_incidencias_chofer.html"
 
 
 class AlertaSoatTemplateView(TemplateView):
@@ -81,37 +81,36 @@ class AlertaSoatTemplateView(TemplateView):
         revisiones = Soat.objects.all().order_by('fecha_renovacion')
 
         # Obtener la fecha actual
+        # Obtener la fecha actual
         fecha_actual = timezone.now().date()
 
         alertas = []
 
         for revision in revisiones:
-            # Calcular el tiempo transcurrido desde la fecha de renovación
+            # Calcular el tiempo transcurrido desde la fecha de revisión
             tiempo_transcurrido = fecha_actual - revision.fecha_renovacion
-            meses_transcurridos = tiempo_transcurrido.days / 30  # Aproximadamente 30 días por mes
+            meses_transcurridos = tiempo_transcurrido.days / 30
             dias_restantes = 365 - tiempo_transcurrido.days
-            vencido = False  # Variable para indicar si está vencido
+            vencido = False
 
             if dias_restantes < 0:
-                dias_restantes = abs(dias_restantes)  # Convertir a positivo para mostrar días vencidos
+                dias_restantes = abs(dias_restantes)
                 vencido = True
 
-            # Determinar el color de la alerta según los meses transcurridos
             if meses_transcurridos >= 12:
-                alerta_clase = 'alert alert-danger'  # Rojo: Más de 12 meses (un año o más)
+                alerta_clase = 'alert alert-danger'
             elif 11 <= meses_transcurridos < 12:
-                alerta_clase = 'alert alert-warning'  # Amarillo: Entre 11 y 12 meses (falta un mes o menos)
+                alerta_clase = 'alert alert-warning'
             else:
-                alerta_clase = 'alert alert-success'  # Verde: Menos de 11 meses
+                alerta_clase = 'alert alert-success'
 
             alertas.append({
                 'revision': revision,
                 'alerta_clase': alerta_clase,
                 'meses_transcurridos': meses_transcurridos,
                 'dias_restantes': dias_restantes,
-                'vencido': vencido,  # Indica si está vencido
+                'vencido': vencido,
             })
 
-        # Añadir la lista de alertas al contexto
         context['alertas'] = alertas
         return context
