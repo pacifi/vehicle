@@ -14,11 +14,12 @@ class DashboardTemplateView(TemplateView):
 class ReporteVelcidadTemplateView(TemplateView):
     template_name = "vehicle/reporte_velocidad.html"
 
-class RevisionTecnicaTemplateView(TemplateView):
+
+class AlertaRevisionTecnicaTemplateView(TemplateView):
     template_name = "vehicle/alerta_revision.html"
 
     def get_context_data(self, **kwargs):
-        context = super(RevisionTecnicaTemplateView, self).get_context_data(**kwargs)
+        context = super(AlertaRevisionTecnicaTemplateView, self).get_context_data(**kwargs)
 
         # Obtener todas las revisiones técnicas, ordenadas por fecha desde la más antigua a la más reciente
         revisiones = RevisionTecnica.objects.all().order_by('fecha_revision')
@@ -59,6 +60,7 @@ class RevisionTecnicaTemplateView(TemplateView):
         context['alertas'] = alertas
         return context
 
+
 class ReporteIncidenciasTemplateView(TemplateView):
     template_name = "vehicle/reporte_incidencias.html"
 
@@ -66,11 +68,12 @@ class ReporteIncidenciasTemplateView(TemplateView):
         context = super(ReporteIncidenciasTemplateView, self).get_context_data(**kwargs)
         return context
 
-class SoatTemplateView(TemplateView):
-    template_name = "vehicle/reporte_soat.html"
+
+class AlertaSoatTemplateView(TemplateView):
+    template_name = "vehicle/alerta_soat.html"
 
     def get_context_data(self, **kwargs):
-        context = super(SoatTemplateView, self).get_context_data(**kwargs)
+        context = super(AlertaSoatTemplateView, self).get_context_data(**kwargs)
 
         # Obtener todas las revisiones del SOAT, ordenadas por fecha de renovación
         revisiones = Soat.objects.all().order_by('fecha_renovacion')
