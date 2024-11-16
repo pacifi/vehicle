@@ -71,6 +71,14 @@ class ReporteIncidenciasChoferTemplateView(TemplateView):
     template_name = "vehicle/reporte_incidencias_chofer.html"
 
 
+class ReporteInfraccionTemplateView(TemplateView):
+    template_name = "vehicle/reporte_infraccion.html"
+
+
+class ReporteInfraccionConductorTemplateView(TemplateView):
+    template_name = "vehicle/reporte_infraccion_conductor.html"
+
+
 class AlertaSoatTemplateView(TemplateView):
     template_name = "vehicle/alerta_soat.html"
 

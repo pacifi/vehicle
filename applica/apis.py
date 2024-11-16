@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from applica.models import Conductor, ExcesoVelocidad, Incidencia
+from applica.models import Conductor, ExcesoVelocidad, Incidencia, Infraccion
 from applica.serializers import ConductorSerializer
 
 
@@ -55,7 +55,7 @@ class ExcesoVelocidadPorVehiculoAPIView(APIView):
             infracciones.append(registro['cantidad'])
 
         # Respuesta con dos listas
-        return Response({"vehiculos":vehiculos, "infracciones":infracciones})
+        return Response({"vehiculos": vehiculos, "infracciones": infracciones})
 
 
 class IncidenciaPorMesAPIView(APIView):
@@ -82,12 +82,61 @@ class IncidenciaPorMesAPIView(APIView):
 
         return Response(respuesta)
 
+
 class IncidenciaPorConductorAPIView(APIView):
     def get(self, request, year, month):
         # Filtrar incidencias por el año y mes proporcionados
         registros = (
             Incidencia.objects
             .filter(fecha_incidencia__year=year, fecha_incidencia__month=month)
+            .values('conductor__id', 'conductor__nombre')  # Agrupar por conductor
+            .annotate(cantidad=Count('id'))  # Contar incidencias por conductor
+            .order_by('-cantidad')  # Ordenar por cantidad de incidencias
+        )
+
+        # Crear listas de conductores y sus incidencias
+        conductores = []
+        incidencias = []
+
+        for registro in registros:
+            conductores.append(registro['conductor__nombre'])  # Nombre del conductor
+            incidencias.append(registro['cantidad'])  # Total de incidencias
+
+        # Respuesta con las dos listas
+        return Response({"conductores": conductores, "incidencias": incidencias})
+
+
+class InfraccionPorMesAPIView(APIView):
+    def get(self, request, year=2024):
+        # Filtrar por año usando `fecha_evento__year`
+        registros = (
+            Infraccion.objects
+            .filter(fecha_infraccion__year=year)
+            .annotate(mes=TruncMonth('fecha_infraccion'))
+            .values('mes')
+            .annotate(cantidad=Count('id'))
+            .order_by('mes')
+        )
+
+        # Crear un diccionario para contar registros por cada mes del año
+        conteo_mensual = {mes: 0 for mes in range(1, 13)}
+
+        for registro in registros:
+            mes = registro['mes'].month
+            conteo_mensual[mes] = registro['cantidad']
+
+        # Convertir el conteo a una lista en el formato deseado
+        respuesta = [conteo_mensual[mes] for mes in range(1, 13)]
+
+        return Response(respuesta)
+
+
+class InfraccionPorConductorAPIView(APIView):
+    def get(self, request, year, month):
+        # Filtrar incidencias por el año y mes proporcionados
+        registros = (
+            Infraccion.objects
+            .filter(fecha_infraccion__year=year, fecha_infraccion__month=month)
             .values('conductor__id', 'conductor__nombre')  # Agrupar por conductor
             .annotate(cantidad=Count('id'))  # Contar incidencias por conductor
             .order_by('-cantidad')  # Ordenar por cantidad de incidencias

@@ -63,9 +63,9 @@
                 async loadData() {
                     try {
                         // Solicita los datos del año seleccionado
-                        const response = await axios.get(`/app/api/excesos-velocidad-vehiculo/${this.year}/${this.month}`);
-                        this.dataLabel = response.data.vehiculos || []; // Asegurarse de que `data` siempre sea un arreglo
-                        this.dataReport = response.data.infracciones || []; // Asegurarse de que `data` siempre sea un arreglo
+                        const response = await axios.get(`/app/api/infraccion-conductor/${this.year}/${this.month}`);
+                        this.dataLabel = response.data.conductores || []; // Asegurarse de que `data` siempre sea un arreglo
+                        this.dataReport = response.data.incidencias || []; // Asegurarse de que `data` siempre sea un arreglo
 
                         // Si el gráfico ya existe, destrúyelo primero antes de crear uno nuevo
                         if (this.chart) {
@@ -117,7 +117,7 @@
                         data: {
                             labels: this.dataLabel,
                             datasets: [{
-                                label: 'Excesos de Velocidad por vehiculo',
+                                label: 'Infracciones por conductor',
                                 data: this.dataReport,
                                 backgroundColor: colors,
                                 borderColor: borderColors,

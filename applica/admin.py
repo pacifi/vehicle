@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import Textarea
 
 from applica.models import Conductor, Vehiculo, Marca, Modelo, ConductorVehiculo, RevisionTecnica, Infraccion, \
     Incidencia, ExcesoVelocidad, Soat
@@ -49,6 +51,11 @@ class RevisionTecnicaAdmin(ModelAdmin):
 class InfraccionAdmin(ModelAdmin):
     list_display = ("id", "conductor", "fecha_infraccion", "fecha_infraccion", "monto", "pagada")
     search_fields = ("id", "conductor__dni", "conductor__nombre")
+    autocomplete_fields = ('conductor',)
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 3, 'cols': 80})},
+        # Cambia filas y columnas según tu preferencia
+    }
 
 
 @admin.register(Incidencia, site=custom_admin_site)
